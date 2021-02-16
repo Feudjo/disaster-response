@@ -1,8 +1,16 @@
 import sys
+import re
 import pandas as pd
+from sqlalchemy import create_engine
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sqlalchemy import create_engine
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+
+
 
 
 def load_data(database_filepath):
@@ -17,10 +25,33 @@ def load_data(database_filepath):
     return df
 
 def tokenize(text):
-    pass
+    """
+    Text preprocessor.
+    :param text:
+    :type text: str
+    :return:
+    """
+
+    stopword = stopwords.words('english')
+
+    #Detect and remove urls, punctuation
+    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    detected_urls = re.findall(url_regex, text)
+    for url in detected_urls:
+        text = text.replace(url, "urlplaceholder")
+    text = re.sub("[^a-zA-Z0-9]+", ' ', text)
+
+    # Lemmatize text while removing spaces at the beginning and end of strings
+    tokens = []
+    lemmatizer = WordNetLemmatizer()
+    for word in word_tokenize(text.lower()):
+        tokens.append(lemmatizer.lemmatize(word, pos='v').strip)
+
+    return tokens
 
 
 def build_model():
+
     pass
 
 
