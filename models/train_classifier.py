@@ -9,6 +9,10 @@ from nltk.corpus import stopwords
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.multioutput import MultiOutputClassifier
+
+import xgboost as xgb
 
 
 
@@ -45,14 +49,19 @@ def tokenize(text):
     tokens = []
     lemmatizer = WordNetLemmatizer()
     for word in word_tokenize(text.lower()):
-        tokens.append(lemmatizer.lemmatize(word, pos='v').strip)
+        if word not in stopword:
+            tokens.append(lemmatizer.lemmatize(word, pos='v').strip)
 
     return tokens
 
 
 def build_model():
-
-    pass
+    pipeline = Pipeline([
+        ('vect', CountVectorizer(tokenizer=tokenize)),
+        ('tfidf', TfidfTransformer())
+        ('rfc', MultiOutputClassifier(RandomForestClassifier()))
+    ])
+    return pipeline
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
