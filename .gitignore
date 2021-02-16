@@ -1,5 +1,7 @@
 # Data
-data
+data/disaster_messages.csv
+data/disaster_categories.csv
+data/DisasterResponse.db
 
 # ideagir
 .idea
