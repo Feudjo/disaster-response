@@ -1,9 +1,20 @@
 import sys
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sqlalchemy import create_engine
 
 
 def load_data(database_filepath):
-    pass
+    """
 
+    :param database_filepath:
+    :type database_filepath:str
+    :return:
+    """
+    engine = create_engine('sqlite:///{}'.format(database_filepath))
+    df = pd.read_sql_table('disaster_table', con=engine)
+    return df
 
 def tokenize(text):
     pass
