@@ -11,8 +11,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
+from sklearn.metrics import classification_report
 
-import xgboost as xgb
 
 
 
@@ -25,7 +25,7 @@ def load_data(database_filepath):
     :return:
     """
     engine = create_engine('sqlite:///{}'.format(database_filepath))
-    df = pd.read_sql_table('disaster_table', con=engine)
+    df = pd.read_sql_table('DisasterResponse.db', con=engine)
     return df
 
 def tokenize(text):
@@ -46,11 +46,12 @@ def tokenize(text):
     text = re.sub("[^a-zA-Z0-9]+", ' ', text)
 
     # Lemmatize text while removing spaces at the beginning and end of strings
-    tokens = []
+    tokens_list = []
+    tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
-    for word in word_tokenize(text.lower()):
+    for word in tokens:
         if word not in stopword:
-            tokens.append(lemmatizer.lemmatize(word, pos='v').strip)
+            tokens_list.append(lemmatizer.lemmatize(word, pos='v').strip())
 
     return tokens
 
@@ -60,12 +61,26 @@ def build_model():
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer())
         ('rfc', MultiOutputClassifier(RandomForestClassifier()))
-    ])
+    ], verbose=True)
     return pipeline
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    """
+
+    :param model:
+    :param X_test:
+    :type X_test: np.array
+    :param Y_test:
+    :type Y_test: np.array
+    :param category_names:
+    :type category_names: list
+    :return:
+    """
+    y_pred = model.predict(X_test)
+    for i, c in enumerate(category_names):
+        print(classification_report(Y_test[c], y_pred[c], target_names=[category_names[i]]))
+
 
 
 def save_model(model, model_filepath):
