@@ -26,8 +26,10 @@ def load_data(database_filepath):
     :return:
     """
     engine = create_engine('sqlite:///{}'.format(database_filepath))
-    df = pd.read_sql_table('DisasterResponse.db', con=engine)
-    return df
+    df = pd.read_sql_table('disaster_table', con=engine)
+    X = df['message']
+    y = df.drop(['message', 'original', 'id','genre'], axis=1)
+    return X, y, y.columns.to_list()
 
 def tokenize(text):
     """
