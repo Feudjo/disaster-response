@@ -1,4 +1,5 @@
 import sys
+import pickle
 import re
 import pandas as pd
 from sqlalchemy import create_engine
@@ -84,7 +85,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
-    pass
+    pickle.dump(model, open(model_filepath, 'wb'))
 
 
 def main():
