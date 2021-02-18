@@ -62,27 +62,18 @@ def tokenize(text):
 def build_model():
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
-        ('tfidf', TfidfTransformer())
-        ('rfc', MultiOutputClassifier(RandomForestClassifier()))
+        ('tfidf', TfidfTransformer(norm='l1')),
+        ('rfc', MultiOutputClassifier(RandomForestClassifier(n_jobs=-1)))
     ], verbose=True)
     return pipeline
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    """
-
-    :param model:
-    :param X_test:
-    :type X_test: np.array
-    :param Y_test:
-    :type Y_test: np.array
-    :param category_names:
-    :type category_names: list
-    :return:
-    """
-    y_pred = model.predict(X_test)
+    print(type(X_test), type(Y_test))
+    print(category_names)
+    y_pred = pd.DataFrame(model.predict(X_test), columns=category_names)
     for i, c in enumerate(category_names):
-        print(classification_report(Y_test[c], y_pred[c], target_names=[category_names[i]]))
+        print(classification_report(Y_test[c], y_pred[c]))
 
 
 
