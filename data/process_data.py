@@ -5,15 +5,14 @@ from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
     """
-    Load two Dataframes. One From messages_filepath, the other from Categories_filepath.
-    Merges both dataframes.
-
+    Loads, merges two dataframes, and returns a merged datdframe.
 
     :param messages_filepath
     :type messages_filepath: str
     :param categories_filepath
     :type categories_filepath: str
-    :return: pd.DataFrame
+    :return: merged dataframe
+    :rtype: pd.DataFrame
     """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
@@ -23,12 +22,12 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
-    """
-    Data transformation
+    """Creats new column for each message category. Returns df concatenated with the new columns.
 
     :param df: dframe to clean
     :type pd.DataFrame
-    :return: dframe
+    :return: concatenated dataframe
+    :rtype: pd.DataFrame
     """
     # Create different category columns
     df_categories = df.categories.str.split(';', expand=True)
@@ -56,13 +55,13 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
-    """
+    """ Saves df in a database.
 
     :param df:
     :type pd.DataFrame
     :param database_filename:
     :type  database_filename: str
-    :return:
+    :return: None
     """
     engine = create_engine('sqlite:///{}'.format(database_filename))
     df.to_sql('disaster_table', engine, index=False)

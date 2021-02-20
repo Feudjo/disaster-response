@@ -19,26 +19,27 @@ from sklearn.metrics import classification_report
 
 
 def load_data(database_filepath):
-    """
+    """Reads data from database in database_filepath and returns a 3-turple.
 
     :param database_filepath:
     :type database_filepath:str
-    :return:
+    :return:(features, labels, categories_name)
+    :rtype: tuple
     """
     engine = create_engine('sqlite:///{}'.format(database_filepath))
     df = pd.read_sql_table('disaster_table', con=engine)
     X = df['message']
-    y = df.drop(['message', 'original', 'id','genre'], axis=1)
+    y = df.drop(['message', 'original', 'id', 'genre'], axis=1)
     return X, y, y.columns.to_list()
 
 def tokenize(text):
-    """
-    Text preprocessor.
+    """ Text preprocessor. Returns cleaned, lemmatized tokens of text.
+
     :param text:
     :type text: str
-    :return:
+    :rtype: list
+    :return: list of clean tokens
     """
-
     stopword = stopwords.words('english')
 
     #Detect and remove urls, punctuation
@@ -56,10 +57,13 @@ def tokenize(text):
         if word not in stopword:
             tokens_list.append(lemmatizer.lemmatize(word, pos='v').strip())
 
-    return tokens
+    return tokens_list
 
 
 def build_model():
+    """Returns a pipeline of transform with random forest classifier as final estimator.
+    :return: Pipeline
+    """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer(norm='l1')),
@@ -69,15 +73,32 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    print(type(X_test), type(Y_test))
-    print(category_names)
-    y_pred = pd.DataFrame(model.predict(X_test), columns=category_names)
+    """Prints classification report (precision, recall) for each label in category_names.
+
+    :param model:
+    :param X_test:
+    :param Y_test:
+    :param category_names:
+    :type category_names: list
+    :return: None
+    """
+
+    y_pred = model.predict(X_test)
+    y_pred = pd.DataFrame(y_pred, columns=category_names)
     for i, c in enumerate(category_names):
-        print(classification_report(Y_test[c], y_pred[c]))
+       print(classification_report(Y_test[c], y_pred[c]))
 
 
 
 def save_model(model, model_filepath):
+    """Saves model
+
+    :param model:
+    :type model: sklear.pipeline.Pipeline
+    :param model_filepath:
+    :type model_filepath: str
+    :return: None
+    """
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
