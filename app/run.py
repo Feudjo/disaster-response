@@ -41,12 +41,39 @@ def index():
     
     # extract data needed for visuals
     # TODO: Below is an example - modify to extract data for your own visuals
-    genre_counts = df.groupby('genre').count()['message']
+    #plot 1 data
+    df_categories = df.drop(['message', 'original', 'id','genre'], axis=1)
+    df_top_five = df_categories.sum().sort_values(ascending=False)[:5]
+    top_five_counts = df_top_five.tolist()
+    top_five_names = df_top_five.index.tolist()
+
+    #plot 2 data
+    genre_counts = df.groupby('genre').count()['related']
     genre_names = list(genre_counts.index)
-    
+
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
+        {
+            'data': [
+                Bar(
+                    x=top_five_names,
+                    y=top_five_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Top Five Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "category"
+                }
+            }
+        },
+
         {
             'data': [
                 Bar(
@@ -56,17 +83,18 @@ def index():
             ],
 
             'layout': {
-                'title': 'Distribution of Message Genres',
+                'title': 'Distribution of Food Category by Genre',
                 'yaxis': {
                     'title': "Count"
                 },
                 'xaxis': {
-                    'title': "Genre"
+                    'title': "category"
                 }
             }
         }
     ]
-    
+
+
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
@@ -94,7 +122,7 @@ def go():
 
 
 def main():
-    app.run(host='0.0.0.0', port=3001, debug=True)
+    app.run(host='localhost', port=3001, debug=True)
 
 
 if __name__ == '__main__':
