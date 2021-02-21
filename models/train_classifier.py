@@ -7,7 +7,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.ensemble import RandomForestClassifier
@@ -61,15 +61,24 @@ def tokenize(text):
 
 
 def build_model():
-    """Returns a pipeline of transform with random forest classifier as final estimator.
-    :return: Pipeline
+    """Returns a GridSearchCv object that performs hyperparameter optimization of the pipeline.
+    :return: GridSearchCV
     """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer(norm='l1')),
-        ('rfc', MultiOutputClassifier(RandomForestClassifier(n_jobs=-1)))
+        ('rfc', MultiOutputClassifier(RandomForestClassifier(n_jobs=2)))
     ], verbose=True)
-    return pipeline
+
+
+    parameters = {
+        'tfidf__use_idf': (True, False),
+        'rfc__estimator__n_estimators': [50, 100, 200]
+    }
+
+    cv = GridSearchCV(pipeline, param_grid=parameters, n_jobs=1)
+
+    return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
