@@ -18,4 +18,4 @@ We build a machine learning model that assigns a label to an incoming message.
 
 3. Go to http://0.0.0.0:3001/
 
-![](data/disaster.PNG)
+![](screenshot/disaster.PNG)
