@@ -1,4 +1,9 @@
 # Disaster Response Pipeline Project
+### Introduction:
+Disaster response organizations receive millions of unstructured text messages via social media after a disaster.
+This information needs to be categorized and assigned to the responsible department in the organization.
+We build a machine learning model that assigns a label to an incoming message.
+
 
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
